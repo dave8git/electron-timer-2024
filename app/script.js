@@ -7,23 +7,38 @@ const App = () => {
   const [time, setTime] = useState(0);
   const [timer, setTimer] = useState(null);
 
-  // const formTime = () => {
-  //   return `${min.toString().padStart(2, '0')}:${sec.toString().padStart(2, '0')}`;
-  // }
+  const formatTime = (seconds) => {
+    const hours = Math.floor(seconds / 3600);
+    const minutes = Math.floor((seconds % 3600) / 60);
+    const secs = seconds % 60; 
+    return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
+  }
 
   const startTimer = () => {
-    setTime(1200);
+    setTime(20);
     setStatus('work');
-    setTimer(setInterval(() => {
+    const interval = setInterval(() => {
       setTime(prevTime => {
+        if (prevTime <= 1) {
+          clearInterval(interval);
+          setStatus('rest');
+          return 0;
+        }
         console.log('time', prevTime-1);
         return prevTime -1;
       });
       console.log('time', time);
-    }, 1000))
+    }, 1000);
+    setTimer(interval);
   }
 
  
+  const stopTimer = () => {
+    clearInterval(timer);
+    setStatus('off');
+    setTime(0);
+  }
+
 
   return (
     <div>
@@ -35,10 +50,10 @@ const App = () => {
       {status === 'work' && (<img src="./images/work.png" />)}
       {status === 'rest' && (<img src="./images/rest.png" />)}
       {status !== 'off' && (<div className="timer">
-        18:23
+        {formatTime(time)}
       </div>)}
       {status === 'off' && (<button className="btn" onClick={startTimer}>Start</button>)}
-      {status !== 'off' && (<button className="btn">Stop</button>)}
+      {status !== 'off' && (<button className="btn" onClick={stopTimer}>Stop</button>)}
       <button className="btn btn-close">X</button>
     </div>
   )
