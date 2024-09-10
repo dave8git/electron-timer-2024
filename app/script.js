@@ -14,31 +14,41 @@ const App = () => {
     return `${String(hours).padStart(2,'0')}:${String(minutes).padStart(2, '0')}:${String(secs).padStart(2, '0')}`;
   }
 
-  const startTimer = () => {
-    setTime(20);
-    setStatus('work');
-    const interval = setInterval(() => {
-      setTime(prevTime => {
-        if (prevTime <= 1) {
-          clearInterval(interval);
-          setStatus('rest');
-          return 0;
-        }
-        console.log('time', prevTime-1);
-        return prevTime -1;
-      });
-      console.log('time', time);
-    }, 1000);
-    setTimer(interval);
-  }
 
+  const startTimer = (timeValue, status) => {
+    setStatus(status);
+    setTime(timeValue);
+    const interval = setInterval(function () {
+      setTime(prevTime => {
+        if(prevTime === 1) {
+          clearInterval(interval);
+          if(status === 'work') {
+            setStatus('rest');
+            startTimer(10, 'rest');
+          } else {
+            setStatus('work');
+            startTimer(20, 'work');
+          }
+          
+        }
+        return prevTime - 1;
+      });
+      
+    }, 1000);
+  } 
+   
+
+ 
  
   const stopTimer = () => {
     clearInterval(timer);
-    setStatus('off');
     setTime(0);
+    setStatus('off');
   }
 
+  const stopApp = () => {
+    window.close();
+  }
 
   return (
     <div>
@@ -52,9 +62,9 @@ const App = () => {
       {status !== 'off' && (<div className="timer">
         {formatTime(time)}
       </div>)}
-      {status === 'off' && (<button className="btn" onClick={startTimer}>Start</button>)}
+      {status === 'off' && (<button className="btn" onClick={() => startTimer(1200, 'work')}>Start</button>)}
       {status !== 'off' && (<button className="btn" onClick={stopTimer}>Stop</button>)}
-      <button className="btn btn-close">X</button>
+      <button className="btn btn-close" onClick={stopApp}>X</button>
     </div>
   )
 };
